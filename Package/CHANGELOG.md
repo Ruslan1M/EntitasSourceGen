@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.1] - 2026-11-10
+
+### Changed
+- `Feature` is generated in every marker assembly that has contexts (as in Jenny), not only when events or cleanups exist. Declaring your own `Feature` in the same namespace still turns it off.
+
 ## [1.0.0] - 2026-11-10
 
 ### Added

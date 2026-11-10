@@ -185,8 +185,8 @@ internal static class Analysis
             contexts.Add(new ContextModel(contextName, ordered, events.ToEquatableArray(), cleanups.ToEquatableArray()));
         }
 
-        var needsFeature = contexts.Any(c => !c.Events.IsEmpty || !c.Cleanups.IsEmpty);
-        var generateFeature = needsFeature && !existing.Contains(qualifier + "Feature");
+        // Like Jenny: Feature always exists (empty features, event/cleanup systems), unless the user declares one.
+        var generateFeature = contexts.Count > 0 && !existing.Contains(qualifier + "Feature");
         return new AnalysisResult(contexts.ToImmutable(), problems.Distinct().ToImmutableArray(), generateFeature);
     }
 

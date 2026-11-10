@@ -1,6 +1,6 @@
 {
   "name": "com.ruslan1m.entitas-sourcegen",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "Entitas Source Generator",
   "description": "Roslyn incremental source generator for Entitas 1.14.1 (Jenny replacement). Ships the Entitas 1.14.1 runtime and Visual Debugging DLLs.",
   "unity": "6000.0",

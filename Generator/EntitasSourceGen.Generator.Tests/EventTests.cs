@@ -85,8 +85,10 @@ public sealed class View : IPositionListener, IAnyScoreListener, IAnyScoreRemove
         Assert.That(own.Sources.Select(s => s.HintName), Does.Not.Contain("Feature.g.cs"));
         Assert.That(own.CompileErrors, Is.Empty, string.Join("\n", own.CompileErrors));
 
-        var none = Run(Marker, ContextAttributes, "[Game] public sealed class AComponent : Entitas.IComponent { }");
-        Assert.That(none.Sources.Select(s => s.HintName), Does.Not.Contain("Feature.g.cs"));
+        var plain = Run(Marker, ContextAttributes, "[Game] public sealed class AComponent : Entitas.IComponent { }",
+            "public sealed class MyFeature : Feature { public MyFeature() : base(\"My\") { } }");
+        Assert.That(plain.Sources.Select(s => s.HintName), Does.Contain("Feature.g.cs"));
+        Assert.That(plain.CompileErrors, Is.Empty, string.Join("\n", plain.CompileErrors));
     }
 
     [Test]

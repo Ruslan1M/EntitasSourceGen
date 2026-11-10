@@ -28,7 +28,7 @@ The package is the `Package/` folder of this repository (UPM package `com.ruslan
 
 **Git URL** (pin a tag; a private repo needs git credentials on the machine):
 ```json
-"com.ruslan1m.entitas-sourcegen": "https://github.com/Ruslan1M/EntitasSourceGen.git?path=/Package#v1.0.0"
+"com.ruslan1m.entitas-sourcegen": "https://github.com/Ruslan1M/EntitasSourceGen.git?path=/Package#v1.0.1"
 ```
 
 To run the package tests in a project, add `"testables": ["com.ruslan1m.entitas-sourcegen"]` to its manifest.
@@ -127,7 +127,7 @@ systems.Execute(); systems.Cleanup();
 | `Game.Events.g.cs` | `IXListener`, `XListenerComponent`, `XEventSystem`, `GameEventSystems : Feature` |
 | `Game.Cleanup.g.cs` | `RemoveXGameSystem` / `DestroyXGameSystem`, `GameCleanupSystems : Feature` |
 | `Contexts.g.cs`, `Contexts.EntityIndices.g.cs` | `Contexts`, index names, explicit index registration |
-| `Feature.g.cs` | plain `Feature : Entitas.Systems`. It is generated only when events or cleanups exist and you have not declared a `Feature` class in the same namespace yourself. Your own `Feature` must be a class derived from `Entitas.Systems` with a parameterless constructor; nothing checks this for you |
+| `Feature.g.cs` | plain `Feature : Entitas.Systems`, as in Jenny. It is always generated unless you declare a `Feature` class in the same namespace yourself. Your own `Feature` must be a class derived from `Entitas.Systems` with a parameterless constructor; nothing checks this for you |
 
 To view the generated code, open Rider → *Dependencies → Analyzers → EntitasSourceGen.Generator*, or Visual Studio → *Analyzers*.
 
