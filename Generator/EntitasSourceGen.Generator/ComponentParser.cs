@@ -53,7 +53,7 @@ internal static class ComponentParser
             else if (IsContextAttribute(attrClass)) contexts.Add(Names.ContextName(attrClass.Name));
         }
 
-        var members = CollectMembers(type, out var membersSupported, out var ignored, out var ambiguous);
+        var members = CollectMembers(type, out var membersSupported, out var ignored, out var ambiguous, ignoredAttributes);
 
         if (!generateMethods)
         {
@@ -109,7 +109,8 @@ internal static class ComponentParser
     /// Readonly fields and init-only / get-only properties are skipped: they cannot be assigned.
     /// </summary>
     private static EquatableArray<FieldModel> CollectMembers(
-        INamedTypeSymbol type, out bool supported, out List<string> ignoredIndex, out List<string> ambiguousIndex)
+        INamedTypeSymbol type, out bool supported, out List<string> ignoredIndex, out List<string> ambiguousIndex,
+        List<string> ignoredAttributes)
     {
         supported = true;
         ignoredIndex = new List<string>();
@@ -127,8 +128,13 @@ internal static class ComponentParser
             {
                 if (member.IsImplicitlyDeclared || member is not (IFieldSymbol or IPropertySymbol)) continue;
 
-                var index = IndexOf(member, out var both);
+                var index = IndexOf(member, out var both, out var indexName);
                 if (both) ambiguousIndex.Add(member.Name);
+                if (indexName is not null && !IsIdentifier(indexName))
+                {
+                    ignoredAttributes.Add($"Index name \"{indexName}\" on '{member.Name}'|it must be a valid C# identifier; the default name is used");
+                    indexName = null;
+                }
 
                 ITypeSymbol? memberType = member.IsStatic || member.DeclaredAccessibility != Accessibility.Public
                     ? null
@@ -148,7 +154,8 @@ internal static class ComponentParser
                 if (!seen.Add(member.Name)) result.RemoveAll(m => m.Name == member.Name);
 
                 if (!IsEffectivelyPublic(memberType)) supported = false;
-                result.Add(new FieldModel(member.Name, memberType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), index));
+                result.Add(new FieldModel(member.Name, memberType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), index,
+                    index == IndexKind.None ? null : indexName));
             }
         }
 
@@ -156,23 +163,38 @@ internal static class ComponentParser
     }
 
     /// <summary>Index attribute on the member or on any property it overrides (Roslyn does not inherit them).</summary>
-    private static IndexKind IndexOf(ISymbol member, out bool both)
+    private static IndexKind IndexOf(ISymbol member, out bool both, out string? indexName)
     {
         var primary = false;
         var entity = false;
+        string? primaryName = null;
+        string? entityName = null;
         for (var m = member; m is not null; m = (m as IPropertySymbol)?.OverriddenProperty)
         {
             foreach (var attribute in m.GetAttributes())
             {
                 var name = attribute.AttributeClass?.ToDisplayString();
-                if (name == Names.PrimaryEntityIndexAttribute) primary = true;
-                else if (name == Names.EntityIndexAttribute) entity = true;
+                var arg = attribute.ConstructorArguments.Length > 0 ? attribute.ConstructorArguments[0].Value as string : null;
+                if (name == Names.PrimaryEntityIndexAttribute && !primary)
+                {
+                    primary = true;
+                    primaryName = arg;
+                }
+                else if (name == Names.EntityIndexAttribute && !entity)
+                {
+                    entity = true;
+                    entityName = arg;
+                }
             }
         }
 
         both = primary && entity;
+        indexName = primary ? primaryName : entityName;
         return primary ? IndexKind.Primary : entity ? IndexKind.Entity : IndexKind.None;
     }
+
+    private static bool IsIdentifier(string name)
+        => SyntaxFacts.IsValidIdentifier(name) && SyntaxFacts.GetKeywordKind(name) == SyntaxKind.None;
 
     private static bool IsEffectivelyPublic(ITypeSymbol type)
     {

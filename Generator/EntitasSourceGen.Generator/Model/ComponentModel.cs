@@ -10,8 +10,11 @@ internal enum IndexKind
     Primary,
 }
 
-/// <summary>Public instance field or settable property of a component. Primitives only (cache-friendly).</summary>
-internal sealed record FieldModel(string Name, string Type, IndexKind Index = IndexKind.None);
+/// <summary>
+/// Public instance field or settable property of a component. Primitives only (cache-friendly).
+/// <see cref="IndexName"/> is set for named (composite) indices: <c>[EntityIndex("Name")]</c>.
+/// </summary>
+internal sealed record FieldModel(string Name, string Type, IndexKind Index = IndexKind.None, string? IndexName = null);
 
 internal enum CleanupKind
 {
@@ -49,6 +52,17 @@ internal sealed record ComponentModel(
 
     /// <summary>Name usable as a standalone identifier (escaped if it is a keyword).</summary>
     public string Id => Names.Escape(Name);
+
+    /// <summary>
+    /// Single member named <c>Value</c>: <c>entity.Speed</c> returns <c>entity.speed.Value</c>.
+    /// Needs a PascalCase name (otherwise it would collide with the component property) that is not a built-in
+    /// member of Entity / Context (<c>Destroy</c>, <c>Reset</c>…): then the shortcut is just left out.
+    /// </summary>
+    public bool HasValueProperty => !IsGenerated && Fields.Length == 1 && Fields[0].Name == "Value" && char.IsUpper(Name[0])
+                                    && !Analysis.EntityReserved.Contains(Name) && !Analysis.ContextReserved.Contains(Name);
+
+    /// <summary>Generated <c>I{Name}Entity</c> interface for components shared by several contexts.</summary>
+    public string InterfaceName => "I" + Name + "Entity";
 }
 
 /// <summary>Equatable location data, turned back into a Location only when reporting.</summary>
@@ -95,9 +109,23 @@ internal sealed record EventInfo(
     public string SystemName => BaseName + "EventSystem";
 }
 
+/// <summary>One member of an entity index key.</summary>
+internal sealed record IndexPart(ComponentModel Component, FieldModel Field);
+
+/// <summary>
+/// Entity index in a context: one part (classic <c>[EntityIndex]</c>) or several parts sharing a name
+/// (composite key, a <c>ValueTuple</c>).
+/// </summary>
+internal sealed record IndexModel(string Name, bool IsPrimary, EquatableArray<IndexPart> Parts)
+{
+    public bool IsComposite => Parts.Length > 1;
+}
+
 /// <summary>One context with its components sorted by name (ordinal).</summary>
 internal sealed record ContextModel(
     string Name,
     EquatableArray<ContextComponent> Components,
     EquatableArray<EventInfo> Events = default,
-    EquatableArray<ComponentModel> Cleanups = default);
+    EquatableArray<ComponentModel> Cleanups = default,
+    EquatableArray<IndexModel> Indices = default,
+    EquatableArray<string> Interfaces = default);

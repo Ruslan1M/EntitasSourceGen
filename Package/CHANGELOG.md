@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0] - 2026-11-10
+
+### Added
+- `Value` shortcut: a component with one member named `Value` gets `entity.X` (and `context.X` for `[Unique]`), e.g. `entity.Speed` for `entity.speed.Value`. It is left out when the name is a built-in Entity/Context member.
+- `I{X}Entity<TEntity>` / `I{X}Entity` interfaces for components in several contexts, implemented by every entity of those contexts (`Components.Interfaces.g.cs`).
+- Named and composite entity indices: `[EntityIndex("Name")]` / `[PrimaryEntityIndex("Name")]` on members of one or several components form one `ValueTuple` key, with `GetEntitiesWithName(a, b)` / `GetEntityWithName(a, b)`.
+- Diagnostics ECG011 (named index mixes index kinds) and ECG012 (named index incomplete in a context).
+
+### Changed
+- Fluent entity API: `AddX` / `ReplaceX` / `RemoveX` return the entity.
+- `Feature` (Jenny parity): `DebugSystems` in the Editor when the assembly references `Entitas.VisualDebugging.Unity`, named after its type ("Movement Feature"); a profiled `Systems` in development builds; a plain `Systems` otherwise.
+
 ## [1.0.1] - 2026-11-10
 
 ### Changed

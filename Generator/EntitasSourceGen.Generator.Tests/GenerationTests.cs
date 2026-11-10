@@ -70,7 +70,7 @@ public static class Usage
             "Contexts.g.cs",
             "Game.Lookup.g.cs", "Game.Context.g.cs", "Game.Entity.g.cs", "Game.Matcher.g.cs", "Game.Unique.g.cs",
             "Input.Lookup.g.cs", "Input.Context.g.cs", "Input.Entity.g.cs", "Input.Matcher.g.cs",
-            "Feature.g.cs",
+            "Feature.g.cs", "Components.Interfaces.g.cs",
         }));
     }
 

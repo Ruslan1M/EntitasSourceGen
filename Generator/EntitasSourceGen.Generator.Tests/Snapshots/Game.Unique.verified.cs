@@ -22,6 +22,7 @@ public sealed partial class GameContext
 
     public global::GameEntity scoreEntity { get { return GetGroup(global::GameMatcher.Score).GetSingleEntity(); } }
     public global::ScoreComponent score { get { return scoreEntity.score; } }
+    public int Score { get { return scoreEntity.Score; } }
     public bool hasScore { get { return scoreEntity != null; } }
 
     public global::GameEntity SetScore(int newValue)

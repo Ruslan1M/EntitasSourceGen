@@ -55,44 +55,57 @@ public sealed partial class GameEntity : global::Entitas.Entity
     public global::PositionComponent position { get { return (global::PositionComponent)GetComponent(global::GameComponentsLookup.Position); } }
     public bool hasPosition { get { return HasComponent(global::GameComponentsLookup.Position); } }
 
-    public void AddPosition(float newX, float newY)
+    public global::GameEntity AddPosition(float newX, float newY)
     {
         var index = global::GameComponentsLookup.Position;
         var component = CreateComponent<global::PositionComponent>(index);
         component.X = newX;
         component.Y = newY;
         AddComponent(index, component);
+        return this;
     }
 
-    public void ReplacePosition(float newX, float newY)
+    public global::GameEntity ReplacePosition(float newX, float newY)
     {
         var index = global::GameComponentsLookup.Position;
         var component = CreateComponent<global::PositionComponent>(index);
         component.X = newX;
         component.Y = newY;
         ReplaceComponent(index, component);
+        return this;
     }
 
-    public void RemovePosition() { RemoveComponent(global::GameComponentsLookup.Position); }
+    public global::GameEntity RemovePosition()
+    {
+        RemoveComponent(global::GameComponentsLookup.Position);
+        return this;
+    }
 
     public global::ScoreComponent score { get { return (global::ScoreComponent)GetComponent(global::GameComponentsLookup.Score); } }
+    public int Score { get { return score.Value; } }
     public bool hasScore { get { return HasComponent(global::GameComponentsLookup.Score); } }
 
-    public void AddScore(int newValue)
+    public global::GameEntity AddScore(int newValue)
     {
         var index = global::GameComponentsLookup.Score;
         var component = CreateComponent<global::ScoreComponent>(index);
         component.Value = newValue;
         AddComponent(index, component);
+        return this;
     }
 
-    public void ReplaceScore(int newValue)
+    public global::GameEntity ReplaceScore(int newValue)
     {
         var index = global::GameComponentsLookup.Score;
         var component = CreateComponent<global::ScoreComponent>(index);
         component.Value = newValue;
         ReplaceComponent(index, component);
+        return this;
     }
 
-    public void RemoveScore() { RemoveComponent(global::GameComponentsLookup.Score); }
+    public global::GameEntity RemoveScore()
+    {
+        RemoveComponent(global::GameComponentsLookup.Score);
+        return this;
+    }
 }

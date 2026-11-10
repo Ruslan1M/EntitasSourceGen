@@ -18,7 +18,8 @@
         "DesperateDevs.Caching.dll",
         "DesperateDevs.Reflection.dll",
         "DesperateDevs.Extensions.dll",
-        "Sherlog.dll"
+        "Sherlog.dll",
+        "Entitas.VisualDebugging.Unity.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

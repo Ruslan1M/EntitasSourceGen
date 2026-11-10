@@ -20,20 +20,23 @@ public sealed class InputAttribute : EntitasSourceGen.ContextAttribute { }
     private static readonly Lazy<ImmutableArray<SyntaxTree>> AttributeTrees = new(LoadAttributeTrees);
 
     public static CSharpCompilation CreateCompilation(params string[] sources)
+        => CreateCompilation(CSharp9Options, Enumerable.Empty<MetadataReference>(), sources);
+
+    private static CSharpCompilation CreateCompilation(CSharpParseOptions options, IEnumerable<MetadataReference> extra, string[] sources)
     {
-        var trees = sources.Select((s, i) => CSharpSyntaxTree.ParseText(s, CSharp9Options, path: $"Source{i}.cs"))
-            .Concat(AttributeTrees.Value);
+        var trees = sources.Select((s, i) => CSharpSyntaxTree.ParseText(s, options, path: $"Source{i}.cs"))
+            .Concat(AttributeTrees.Value.Select(t => t.WithRootAndOptions(t.GetRoot(), options)));
         return CSharpCompilation.Create(
             "Consumer",
             trees,
-            References.Value,
+            References.Value.Concat(extra),
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Disable));
     }
 
-    public static GeneratorDriver CreateDriver(bool trackSteps = false)
+    public static GeneratorDriver CreateDriver(bool trackSteps = false, CSharpParseOptions? options = null)
         => CSharpGeneratorDriver.Create(
             new[] { new EntitasGenerator().AsSourceGenerator() },
-            parseOptions: CSharp9Options,
+            parseOptions: options ?? CSharp9Options,
             driverOptions: new GeneratorDriverOptions(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: trackSteps));
 
     public static Result Run(params string[] sources)
@@ -41,6 +44,25 @@ public sealed class InputAttribute : EntitasSourceGen.ContextAttribute { }
         var compilation = CreateCompilation(sources);
         var driver = CreateDriver().RunGeneratorsAndUpdateCompilation(compilation, out var output, out var generatorDiagnostics);
         return new Result(driver.GetRunResult(), output, generatorDiagnostics);
+    }
+
+    /// <summary>Like <see cref="Run(string[])"/> with preprocessor symbols and extra references (e.g. UnityEngine).</summary>
+    public static Result RunWith(string[] defines, IEnumerable<MetadataReference> extra, params string[] sources)
+    {
+        var options = CSharp9Options.WithPreprocessorSymbols(defines);
+        var compilation = CreateCompilation(options, extra, sources);
+        var driver = CreateDriver(options: options).RunGeneratorsAndUpdateCompilation(compilation, out var output, out var generatorDiagnostics);
+        return new Result(driver.GetRunResult(), output, generatorDiagnostics);
+    }
+
+    /// <summary>UnityEngine assemblies of a local Unity install (env UNITY_MANAGED or the default path); empty if missing.</summary>
+    public static IReadOnlyList<MetadataReference> UnityReferences()
+    {
+        var dir = Environment.GetEnvironmentVariable("UNITY_MANAGED")
+                  ?? @"D:\Unity\Editors\6000.3.27f1\Editor\Data\Managed\UnityEngine";
+        return Directory.Exists(dir)
+            ? Directory.GetFiles(dir, "UnityEngine*.dll").Select(p => (MetadataReference)MetadataReference.CreateFromFile(p)).ToList()
+            : new List<MetadataReference>();
     }
 
     internal sealed record Result(GeneratorDriverRunResult RunResult, Compilation Output, ImmutableArray<Diagnostic> GeneratorDiagnostics)

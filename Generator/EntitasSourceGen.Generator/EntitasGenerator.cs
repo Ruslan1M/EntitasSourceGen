@@ -10,12 +10,12 @@ namespace EntitasSourceGen.Generator;
 [Generator(LanguageNames.CSharp)]
 public sealed class EntitasGenerator : IIncrementalGenerator
 {
-    /// <summary>Only names shaped like generated event / cleanup / Feature types matter; others never invalidate the cache.</summary>
+    /// <summary>Only names shaped like generated event / cleanup / Feature / I{X}Entity types matter; others never invalidate the cache.</summary>
     private static bool CanClash(string? fullName)
     {
         if (fullName is null) return false;
         var name = fullName.Substring(fullName.LastIndexOf('.') + 1).Replace("global::", string.Empty);
-        return name == "Feature" || name.EndsWith("Listener") || name.EndsWith("ListenerComponent")
+        return name == "Feature" || (name.StartsWith("I") && name.EndsWith("Entity")) || name.EndsWith("Listener") || name.EndsWith("ListenerComponent")
                || name.EndsWith("EventSystem") || name.EndsWith("EventSystems") || name.EndsWith("CleanupSystems")
                || ((name.StartsWith("Remove") || name.StartsWith("Destroy")) && name.EndsWith("System"));
     }

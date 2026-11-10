@@ -19,7 +19,11 @@ namespace Sample.Tests
         public void Lookup_IsSortedByName_AndMatchesTypes()
         {
             CollectionAssert.AreEqual(
-                new[] { "Alive", "Lives", "Name", "Object", "Paused", "PlayerIndex", "Position", "Score", "Team", "Tick" },
+                new[]
+                {
+                    "Alive", "GridCell", "HeroId", "Lives", "Marked", "Name", "Object", "OwnerId", "Paused", "PlayerIndex",
+                    "Position", "Score", "Speed", "StatusKind", "TargetId", "Team", "Tick",
+                },
                 GameComponentsLookup.componentNames);
             Assert.AreEqual(GameComponentsLookup.TotalComponents, GameComponentsLookup.componentTypes.Length);
             Assert.AreEqual(typeof(LivesComponent), GameComponentsLookup.componentTypes[GameComponentsLookup.Lives]);

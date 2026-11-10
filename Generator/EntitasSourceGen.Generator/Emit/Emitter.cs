@@ -64,7 +64,10 @@ internal static class Emitter
         }
 
         if (analysis.GenerateFeature)
-            Add(spc, config, "Feature.g.cs", EventEmitter.EmitFeature);
+            Add(spc, config, "Feature.g.cs", w => FeatureEmitter.Emit(w, config));
+
+        if (!analysis.Interfaces.IsEmpty)
+            Add(spc, config, "Components.Interfaces.g.cs", w => EntityEmitter.EmitInterfaces(w, analysis.Interfaces));
 
         if (contexts.Any(IndexEmitter.HasAny))
             Add(spc, config, "Contexts.EntityIndices.g.cs", w => IndexEmitter.EmitContexts(w, contexts, q));

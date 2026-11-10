@@ -200,16 +200,4 @@ internal static class EventEmitter
             }
         }
     }
-
-    /// <summary><c>Feature.g.cs</c>: plain <c>Entitas.Systems</c> subclass, emitted only if the assembly has none.</summary>
-    public static void EmitFeature(CodeWriter w)
-    {
-        w.Line("/// <summary>Group of systems. Declare your own <c>Feature</c> in this namespace to replace it (e.g. with DebugSystems).</summary>");
-        using (w.Block("public class Feature : global::Entitas.Systems"))
-        {
-            w.Line("public Feature(string name) { }");
-            w.Line();
-            w.Line("public Feature() { }");
-        }
-    }
 }

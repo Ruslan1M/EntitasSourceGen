@@ -28,7 +28,7 @@ The package is the `Package/` folder of this repository (UPM package `com.ruslan
 
 **Git URL** (pin a tag; a private repo needs git credentials on the machine):
 ```json
-"com.ruslan1m.entitas-sourcegen": "https://github.com/Ruslan1M/EntitasSourceGen.git?path=/Package#v1.0.1"
+"com.ruslan1m.entitas-sourcegen": "https://github.com/Ruslan1M/EntitasSourceGen.git?path=/Package#v1.1.0"
 ```
 
 To run the package tests in a project, add `"testables": ["com.ruslan1m.entitas-sourcegen"]` to its manifest.
@@ -90,6 +90,9 @@ using EntitasSourceGen;
 [Game, Unique] public sealed class ScoreComponent : IComponent { public int Value; }
 [Game] public sealed class PlayerIndexComponent : IComponent { [PrimaryEntityIndex] public int Value; }
 [Game] public sealed class TeamComponent : IComponent { [EntityIndex] public string Value; }
+[Game] public sealed class TargetIdComponent : IComponent { [EntityIndex("StatusesOfTarget")] public int Value; }   // composite key
+[Game] public sealed class StatusTypeComponent : IComponent { [EntityIndex("StatusesOfTarget")] public int Value; }
+[Game, Input] public sealed class IdComponent : IComponent { public int Value; }   // several contexts → IIdEntity<T>
 [Game, Event(EventTarget.Self)] public sealed class PositionComponent : IComponent { public float X; public float Y; }
 [Game, Event(EventTarget.Any, EventType.Removed)] public sealed class TargetComponent : IComponent { public int Id; }
 [Input, Cleanup(CleanupMode.RemoveComponent)] public sealed class ClickComponent : IComponent { public int Button; }
@@ -101,11 +104,14 @@ using EntitasSourceGen;
 ```csharp
 var contexts = new Contexts();                       // no singleton unless enabled
 var e = contexts.game.CreateEntity();
-e.AddLives(3); e.ReplaceLives(2); e.RemoveLives();
+e.AddLives(3).ReplaceLives(2);                        // fluent: Add / Replace / Remove return the entity
+int lives = e.Lives;                                 // Value shortcut for e.lives.Value
+e.RemoveLives();
 e.isAlive = true;
 contexts.game.SetScore(10);                          // unique: SetX / ReplaceX / RemoveX / xEntity / hasX
 var p = contexts.game.GetEntityWithPlayerIndex(1);   // primary index
 var red = contexts.game.GetEntitiesWithTeam("red");  // entity index
+var poisons = contexts.game.GetEntitiesWithStatusesOfTarget(targetId: 1, statusType: 2);   // composite index
 e.AddPositionListener(view);                          // view : IPositionListener { OnPosition(GameEntity, float x, float y) }
 
 var systems = new Feature()
@@ -120,14 +126,15 @@ systems.Execute(); systems.Cleanup();
 |---|---|
 | `Game.Lookup.g.cs` | `GameComponentsLookup`: indices sorted by name (ordinal), `TotalComponents`, `componentNames`, `componentTypes` |
 | `Game.Context.g.cs` | `GameContext : Entitas.Context<GameEntity>` |
-| `Game.Entity.g.cs` | `GameEntity`: `x`, `hasX`, `AddX`, `ReplaceX`, `RemoveX`, `isX` |
+| `Game.Entity.g.cs` | `GameEntity`: `x`, `X` (single `Value`), `hasX`, `AddX`, `ReplaceX`, `RemoveX` (return the entity), `isX` |
 | `Game.Matcher.g.cs` | `GameMatcher.X`, `AllOf`, `AnyOf` |
 | `Game.Unique.g.cs` | unique API on `GameContext` |
 | `Game.EntityIndices.g.cs` | `GetEntityWithX` / `GetEntitiesWithX` on `GameContext` |
 | `Game.Events.g.cs` | `IXListener`, `XListenerComponent`, `XEventSystem`, `GameEventSystems : Feature` |
 | `Game.Cleanup.g.cs` | `RemoveXGameSystem` / `DestroyXGameSystem`, `GameCleanupSystems : Feature` |
-| `Contexts.g.cs`, `Contexts.EntityIndices.g.cs` | `Contexts`, index names, explicit index registration |
-| `Feature.g.cs` | plain `Feature : Entitas.Systems`, as in Jenny. It is always generated unless you declare a `Feature` class in the same namespace yourself. Your own `Feature` must be a class derived from `Entitas.Systems` with a parameterless constructor; nothing checks this for you |
+| `Contexts.g.cs`, `Contexts.EntityIndices.g.cs` | `Contexts`, index names, explicit index registration (composite keys are `ValueTuple`s) |
+| `Components.Interfaces.g.cs` | `I{X}Entity<TEntity>` / `I{X}Entity` for components in several contexts |
+| `Feature.g.cs` | `Feature`, as in Jenny: `DebugSystems` in the Editor (if the assembly references `Entitas.VisualDebugging.Unity`), profiled `Systems` in development builds, plain `Systems` otherwise. It is always generated unless you declare a `Feature` class in the same namespace yourself. Your own `Feature` must be a class derived from `Entitas.Systems` with a parameterless constructor; nothing checks this for you |
 
 To view the generated code, open Rider → *Dependencies → Analyzers → EntitasSourceGen.Generator*, or Visual Studio → *Analyzers*.
 
@@ -150,7 +157,9 @@ To view the generated code, open Rider → *Dependencies → Analyzers → Entit
 | ECG007 | Warning | Marker present but no context declared |
 | ECG008 | Error | Both `[PrimaryEntityIndex]` and `[EntityIndex]` on one member |
 | ECG009 | Warning | Index attribute on a member that is not generated (readonly, get-only, static, non-public) |
-| ECG010 | Warning | Attribute ignored: invalid `[FlagPrefix]` or marker `Namespace` (falls back to `is` / the global namespace), or `[Unique]` / `[Event]` / `[Cleanup]` / an index on a `[DontGenerate]` component |
+| ECG010 | Warning | Attribute ignored: invalid `[FlagPrefix]`, marker `Namespace` or index name (falls back to `is` / the global namespace / the default name), or `[Unique]` / `[Event]` / `[Cleanup]` / an index on a `[DontGenerate]` component |
+| ECG011 | Error | A named index mixes `[PrimaryEntityIndex]` and `[EntityIndex]`; it is not generated |
+| ECG012 | Warning | A named index is not generated in a context that lacks some of its components |
 
 Generator exceptions show up in the Unity console as `CS8785`.
 

@@ -34,6 +34,8 @@ internal static class UniqueEmitter
 
         w.Line($"public {s.EntityRef} {entityProp} {{ get {{ return GetGroup({s.MatcherOf(c)}).GetSingleEntity(); }} }}");
         w.Line($"public {c.FullTypeName} {lower} {{ get {{ return {entityProp}.{lower}; }} }}");
+        if (c.HasValueProperty)
+            w.Line($"public {c.Fields[0].Type} {c.Name} {{ get {{ return {entityProp}.{c.Name}; }} }}");
         w.Line($"public bool has{c.Name} {{ get {{ return {entityProp} != null; }} }}");
         w.Line();
 

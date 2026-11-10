@@ -55,4 +55,14 @@ internal static class Diagnostics
         "ECG010", "Attribute ignored",
         "{1} on component '{0}' is ignored: {2}",
         Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor IndexMixedKinds = new(
+        "ECG011", "Named index mixes index kinds",
+        "Index '{0}' mixes [PrimaryEntityIndex] and [EntityIndex] members; it is not generated",
+        Category, DiagnosticSeverity.Error, isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor IndexPartsMissing = new(
+        "ECG012", "Named index incomplete in context",
+        "Index '{0}' is not generated in context '{1}': its members are declared in components missing from this context ({2})",
+        Category, DiagnosticSeverity.Warning, isEnabledByDefault: true);
 }
