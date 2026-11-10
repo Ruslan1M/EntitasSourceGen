@@ -26,9 +26,9 @@ The package is the `Package/` folder of this repository (UPM package `com.ruslan
 "com.ruslan1m.entitas-sourcegen": "file:../../EntitasSourceGen/Package"
 ```
 
-**Git URL** (once the repo is pushed; pin a tag):
+**Git URL** (pin a tag; a private repo needs git credentials on the machine):
 ```json
-"com.ruslan1m.entitas-sourcegen": "https://github.com/<owner>/EntitasSourceGen.git?path=/Package#v1.0.0"
+"com.ruslan1m.entitas-sourcegen": "https://github.com/Ruslan1M/EntitasSourceGen.git?path=/Package#v1.0.0"
 ```
 
 To run the package tests in a project, add `"testables": ["com.ruslan1m.entitas-sourcegen"]` to its manifest.
@@ -196,3 +196,6 @@ foreach (var ctx in contexts.allContexts) new Entitas.VisualDebugging.Unity.Cont
 - `dotnet test Generator/EntitasSourceGen.sln` runs `CSharpGeneratorDriver` tests against the real `Entitas.dll`. They cover C# 9 compilation, the gate, caching, every diagnostic and Verify snapshots per emitter. To accept snapshot changes, replace `*.verified.cs` with `*.received.cs`.
 - CI (`.github/workflows/ci.yml`) runs only the generator tests, because running Unity in CI needs a license.
 - Requirements: the generator project targets netstandard2.0 and uses `Microsoft.CodeAnalysis.CSharp` **4.3.0**. Newer Roslyn packages do not load in Unity 6.
+
+## License
+MIT, see [LICENSE.md](LICENSE.md). Entitas 1.14.1 binaries: MIT, by Simon Schmid.

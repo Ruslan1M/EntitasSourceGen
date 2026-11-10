@@ -7,6 +7,11 @@
   "author": {
     "name": "Ruslan1M"
   },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ruslan1M/EntitasSourceGen.git"
+  },
   "keywords": ["entitas", "ecs", "source-generator", "roslyn", "codegen"],
   "samples": [
     {
