@@ -1,0 +1,9 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+.idea/
+*.received.*
+# Unity-generated, but metas inside Package/ must be committed
+Package/**/*.meta.tmp

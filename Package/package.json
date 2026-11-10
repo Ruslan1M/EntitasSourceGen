@@ -1,0 +1,18 @@
+{
+  "name": "com.ruslan1m.entitas-sourcegen",
+  "version": "1.0.0",
+  "displayName": "Entitas Source Generator",
+  "description": "Roslyn incremental source generator for Entitas 1.14.1 (Jenny replacement). Ships the Entitas 1.14.1 runtime and Visual Debugging DLLs.",
+  "unity": "6000.0",
+  "author": {
+    "name": "Ruslan1M"
+  },
+  "keywords": ["entitas", "ecs", "source-generator", "roslyn", "codegen"],
+  "samples": [
+    {
+      "displayName": "Basic",
+      "description": "Marker, contexts, components with unique, index, event and cleanup, plus a composition root.",
+      "path": "Samples~/Basic"
+    }
+  ]
+}

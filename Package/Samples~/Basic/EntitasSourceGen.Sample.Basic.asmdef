@@ -1,0 +1,23 @@
+{
+    "name": "EntitasSourceGen.Sample.Basic",
+    "rootNamespace": "Sample",
+    "references": [
+        "EntitasSourceGen"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Entitas.dll",
+        "DesperateDevs.Caching.dll",
+        "DesperateDevs.Reflection.dll",
+        "DesperateDevs.Extensions.dll",
+        "Sherlog.dll",
+        "Entitas.VisualDebugging.Unity.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
