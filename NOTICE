@@ -1,0 +1,7 @@
+This repository bundles third-party software:
+
+Entitas 1.14.1 runtime and Visual Debugging binaries
+Copyright (c) Simon Schmid
+Licensed under the MIT License
+Location: Package/Runtime/Plugins/Entitas (see LICENSE.txt in that folder)
+https://github.com/sschmid/Entitas

@@ -26,7 +26,7 @@ The package is the `Package/` folder of this repository (UPM package `com.ruslan
 "com.ruslan1m.entitas-sourcegen": "file:../../EntitasSourceGen/Package"
 ```
 
-**Git URL** (pin a tag; a private repo needs git credentials on the machine):
+**Git URL** (pin a tag):
 ```json
 "com.ruslan1m.entitas-sourcegen": "https://github.com/Ruslan1M/EntitasSourceGen.git?path=/Package#v1.1.0"
 ```
